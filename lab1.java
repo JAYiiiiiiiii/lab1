@@ -1,3 +1,5 @@
+package lab1;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
@@ -334,7 +336,7 @@ public class lab1{
 	}
 	
 	public static void main(String[] args) {
-		System.out.println("ÊäÈëÎÄ±¾ÎÄ¼şÂ·¾¶: ");
+		System.out.println("è¾“å…¥æ–‡æœ¬æ–‡ä»¶è·¯å¾„: ");
 		ArrayList<String> words = new ArrayList<String>();
 		String option = "";
 		Scanner systemIn = new Scanner(System.in);
@@ -378,29 +380,29 @@ public class lab1{
 			if (i != 0)
 				G.newEdge(words.get(i - 1), words.get(i));
 		}
-		System.out.println("1.Õ¹Ê¾ÓĞÏòÍ¼\n2.²éÑ¯ÇÅ½Ó´Ê\n3.¸ù¾İÇÅ½Ó´ÊÉú³ÉĞÂÎÄ±¾\n4.¼ÆËãÁ½¸öµ¥´ÊÖ®¼äµÄ×î¶ÌÂ·¾¶\n5.Ëæ»úÓÎ×ß\n6.ÍË³ö");
+		System.out.println("1.å±•ç¤ºæœ‰å‘å›¾\n2.æŸ¥è¯¢æ¡¥æ¥è¯\n3.æ ¹æ®æ¡¥æ¥è¯ç”Ÿæˆæ–°æ–‡æœ¬\n4.è®¡ç®—ä¸¤ä¸ªå•è¯ä¹‹é—´çš„æœ€çŸ­è·¯å¾„\n5.éšæœºæ¸¸èµ°\n6.é€€å‡º");
 		while ((option = systemIn.nextLine()) != null) {
 			if (option.equals("1"))
 				new lab1().showDirectedGraph(G);
 			if (option.equals("2")) {
 				String word1 = "", word2 = "";
-				System.out.println("ÊäÈëword1: ");
+				System.out.println("è¾“å…¥word1: ");
 				word1 = systemIn.nextLine();
-				System.out.println("ÊäÈëword2: ");
+				System.out.println("è¾“å…¥word2: ");
 				word2 = systemIn.nextLine();
 				System.out.println(queryBridgeWords(word1, word2));
 			}
 			if (option.equals("3")) {
 				String newTxtIn = "";
-				System.out.println("ÊäÈëĞÂÎÄ±¾: ");
+				System.out.println("è¾“å…¥æ–°æ–‡æœ¬: ");
 				newTxtIn = systemIn.nextLine();
 				System.out.println(generateNewText(newTxtIn));
 			}
 			if (option.equals("4")) {
 				String word1 = "", word2 = "";
-				System.out.println("ÊäÈëword1: ");
+				System.out.println("è¾“å…¥word1: ");
 				word1 = systemIn.nextLine();
-				System.out.println("ÊäÈëword2: ");
+				System.out.println("è¾“å…¥word2: ");
 				word2 = systemIn.nextLine();
 				System.out.println(calcShortestPath(word1, word2));
 			}
@@ -408,7 +410,7 @@ public class lab1{
 				System.out.println(randomWalk());
 			if (option.equals("6"))
 				break;
-			System.out.println("1.Õ¹Ê¾ÓĞÏòÍ¼\n2.²éÑ¯ÇÅ½Ó´Ê\n3.¸ù¾İÇÅ½Ó´ÊÉú³ÉĞÂÎÄ±¾\n4.¼ÆËãÁ½¸öµ¥´ÊÖ®¼äµÄ×î¶ÌÂ·¾¶\n5.Ëæ»úÓÎ×ß\n6.ÍË³ö");
+			System.out.println("1.å±•ç¤ºæœ‰å‘å›¾\n2.æŸ¥è¯¢æ¡¥æ¥è¯\n3.æ ¹æ®æ¡¥æ¥è¯ç”Ÿæˆæ–°æ–‡æœ¬\n4.è®¡ç®—ä¸¤ä¸ªå•è¯ä¹‹é—´çš„æœ€çŸ­è·¯å¾„\n5.éšæœºæ¸¸èµ°\n6.é€€å‡º");
 		}
 		systemIn.close();
 	}
