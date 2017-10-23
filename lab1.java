@@ -1,4 +1,3 @@
-package lab1;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,98 +9,46 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-class graph {
-	String[] data;
-	int edgeNumber;
-	int vertexNumber;
-	int[] next;
-	int[] flag;
-	int[][] map;
-	int[][] path;
-	int[][] record;
-
-	
-	public graph() {
-		this.vertexNumber = 0;
-		this.edgeNumber = 0;
-		this.data = new String[99];
-		this.next = new int[99];
-		this.flag = new int[99];
-		this.map = new int[99][99];
-		this.path = new int[99][99];
-		this.record = new int[99][99];
-
-	}
-	
-	public int search(String word) {
-		for (int i = 0; i < this.vertexNumber; i++)
-			if (this.data[i].equals(word))
-				return i;
-			return -1;
-	}
-	public void newVertex(String word) {
-		this.data[this.vertexNumber++] = word;
-	}
-	
-	public void newEdge(String word1, String word2) {
-		int word1Number = 0, word2Number = 0;
-		for (int i = 0; i < this.vertexNumber; i++) {
-			if (this.data[i].equals(word1))
-				word1Number = i;
-			if (this.data[i].equals(word2))
-				word2Number = i;
-		}
-		this.edgeNumber++;
-		this.map[word1Number][word2Number]++;
-	}
-	
-	public void getNext() {
-		this.next = new int[99];
-		this.flag = new int[99];
-		this.path = new int[99][99];
-		this.record = new int[99][99];
-		for (int i = 0; i < this.vertexNumber; i++)
-			for (int j = 0; j < this.vertexNumber; j++)
-				if (this.map[i][j] > 0)
-					this.path[i][this.next[i]++] = j;
-	}
-}
-
-public class lab1{
-	
-	static graph G = new graph();
+public class Lab1{ 
+    
+	static Graph G = new Graph();
 	static int bridgeNumber;
 	static ArrayList<String> bridgeWords;
 	static Random random = new Random();
-	static String dotpath="C:\\Users\\ASUS\\Desktop\\lab1";
-	static String dotmegPath="dot -Tjpg path.dot -o path.jpg";
-	static String dotmeg="dot -Tjpg lab1.dot -o lab1.jpg";
+	static String dotpath = "C:\\Users\\ASUS\\Desktop\\lab1";
+	static String dotmegPath = "dot -Tjpg path.dot -o path.jpg";
+	static String dotmeg = "dot -Tjpg lab1.dot -o lab1.jpg";
+	/**
+	 * ${tags}
+	 */	
 	
-	public void showDirectedGraph(graph G) {
+	public void showDirectedGraph(Graph g) {
 		
-		File file=new File("lab1.dot");
+		File file = new File("lab1.dot");
 		try {
 			file.createNewFile();
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
 		try {
-			byte line[]=null;
+			byte[] line=null;
 			String a,b;
 			FileOutputStream out=new FileOutputStream(file);
 			line="digraph pic1 { \r\n".getBytes();
 			out.write(line);
-			for(int i=0;i<G.vertexNumber;i++)
-				for(int j=0;j<G.vertexNumber;j++)
-					if(G.map[i][j]>=1)
+			for(int i=0;i<g.vertexNumber;i++) {
+				for(int j=0;j<g.vertexNumber;j++)
+					if(g.map[i][j]>=1)
 					{
-						a=G.data[i];
-						b=G.data[j];
-						line=("  "+a+"->"+b+"[label=\""+G.map[i][j]+"\"]\r\n").getBytes();
+						a=g.data[i];
+						b=g.data[j];
+						line=("  " + a + "->" + b + "[label=\"" + g.map[i][j] + "\"]\r\n").getBytes();
 						out.write(line);
 					}
-			line="}".getBytes();
+			}
+				
+			line = "}".getBytes();
 			out.write(line);
 			out.close();
 		}catch(Exception e) {
@@ -110,14 +57,17 @@ public class lab1{
 		
 		try { 
 			Runtime rt = Runtime.getRuntime(); 
-			rt.exec("cmd /c cd "+dotpath +" && "+ dotmeg);
+			rt.exec("cmd /c cd " + dotpath + " && " + dotmeg);
 			  
 		} catch (Exception e) { 
 			e.printStackTrace(); 
 		} 
 			 
 	}
-	
+		
+	/**
+	 * ${tags}
+	 */
 	
 	public static String queryBridgeWords(String word1, String word2) {
 		String bridge = "";
@@ -138,23 +88,34 @@ public class lab1{
 			bridge = "No \"" + word1 + "\" and \"" + word2 + "\" in the graph!";
 		}
 		if (bridgeNumber == 0) {
-			for (int i = 0; i < G.vertexNumber; i++)
+			for (int i = 0; i < G.vertexNumber; i++) {
 				if (G.map[word1Number][i] > 0 && G.map[i][word2Number] > 0)
 					bridgeWords.add(G.data[i]);
+			}
+				
 			bridgeNumber = bridgeWords.size();
 		}
-		if (bridgeNumber == 0)
+		if (bridgeNumber == 0) {
 			bridge = "No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!";
-		if (bridgeNumber == 1)
-			bridge = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" is: " + bridgeWords.get(0);
+		}
+			
+		if (bridgeNumber == 1) {
+			bridge = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" is: " 
+			+ bridgeWords.get(0);
+		}
+			
 		if (bridgeNumber > 1) {
 			bridge = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ";
-			for (int i = 0; i < bridgeWords.size() - 1; i++)
+			for (int i = 0; i < bridgeWords.size() - 1; i++) {
 				bridge += bridgeWords.get(i) + ", ";
+			}			
 			bridge += "and " + bridgeWords.get(bridgeWords.size() - 1) + ".";
 		}
 		return bridge;
 	}
+	/**
+	 * ${tags}
+	 */
 	
 	public static String generateNewText(String inputText) {
 		String newText = "";
@@ -164,8 +125,9 @@ public class lab1{
 		for (int i = 0; i < lineTxt.length(); i++) {
 			if (lineTxt.charAt(i) <= 'z' && lineTxt.charAt(i) >= 'a') {
 				word += lineTxt.charAt(i);
-				if (i == lineTxt.length() - 1)
+				if (i == lineTxt.length() - 1) {
 					words.add(word);
+				}				
 			}
 			else {
 				if (word != "")
@@ -182,19 +144,23 @@ public class lab1{
 				newWord = bridgeWords.get(randomNumber);
 				newText += words.get(i) + " " + newWord + " ";
 			}
-			else
-				newText +=words.get(i) + " ";
+			else {
+				newText += words.get(i) + " ";				
+			}
 		}
 		newText += words.get(words.size() - 1);
 		return newText;
 	}
+	/**
+	 * ${tags}
+	 */
 	
 	public static String calcShortestPath(String word1, String word2) {
 		
-		File file=new File("path.dot");
+		File file = new File("path.dot");
 		try {
 			file.createNewFile();
-		}catch(Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -202,9 +168,9 @@ public class lab1{
 		ArrayList<String> path = new ArrayList<String>();
 		int[] searchList = new int[99];
 		int[] pre = new int[99];
-		int shortestPathRecord[]=new int[99];
-		int num=0;
-		int recordFlag[] = new int[99];
+		int[] shortestPathRecord = new int[99];
+		int num = 0;
+		int[] recordFlag = new int[99];
 		Arrays.fill(searchList, -1);
 		Arrays.fill(pre, -1);
 		int head = 0, tail = 1, goal = G.search(word2);
@@ -230,12 +196,11 @@ public class lab1{
 					path.add(G.data[pos]);
 				}
 				shortestPath += G.data[searchList[0]];
-				shortestPathRecord[num]=searchList[0];
-				for (int i = path.size() - 2; i >= 0; i--)
-				{
-					for(int j=0;j<G.vertexNumber;j++)
+				shortestPathRecord[num] = searchList[0];
+				for (int i = path.size() - 2; i >= 0; i--){
+					for(int j = 0;j < G.vertexNumber;j++)
 						if(path.get(i).equals(G.data[j]))
-							shortestPathRecord[++num]=j;
+							shortestPathRecord[++num] = j;
 					shortestPath += "->" + path.get(i);
 					}
 				shortestPath += "->" + G.data[goal];
@@ -251,54 +216,58 @@ public class lab1{
 			return shortestPath;
 		}
 		try {
-			byte line[]=null;
+			byte[] line = null;
 			String a,b;
-			FileOutputStream out=new FileOutputStream(file);
+			FileOutputStream out = new FileOutputStream(file);
 			line="digraph pic2 { \r\n".getBytes();
 			out.write(line);
-			line=(G.data[shortestPathRecord[0]]+"[color=pink style=filled]\r\n").getBytes();
+			line = (G.data[shortestPathRecord[0]] + "[color=pink style=filled]\r\n").getBytes();
 			out.write(line);
-			for(int i=1;i<num;i++){
-				line=(G.data[shortestPathRecord[i]]+"[color=green style=filled]\r\n").getBytes();
+			for(int i = 1;i < num;i++){
+				line=(G.data[shortestPathRecord[i]] + "[color=green style=filled]\r\n").getBytes();
 				out.write(line);
 			}
-			line=(G.data[shortestPathRecord[num]]+"[color=skyblue style=filled]\r\n").getBytes();
+			line = (G.data[shortestPathRecord[num]] + "[color=skyblue style=filled]\r\n").getBytes();
 			out.write(line);
-			for(int i=0;i<num;i++){
-				a=G.data[shortestPathRecord[i]];
-				b=G.data[shortestPathRecord[i+1]];
-				line=("  "+a+"->"+b+" [label=\""+G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]+"\" style=filled color=blue]\r\n").getBytes();
+			for(int i = 0;i < num;i++){
+				a = G.data[shortestPathRecord[i]];
+				b = G.data[shortestPathRecord[i+1]];
+				line = ("  " + a + "->" + b + " [label=\"" + 
+				G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]+"\" style=filled color=blue]\r\n").getBytes();
 				out.write(line);
-				recordFlag[i]=G.map[shortestPathRecord[i]][shortestPathRecord[i+1]];
-				G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]=0;
+				recordFlag[i] = G.map[shortestPathRecord[i]][shortestPathRecord[i + 1]];
+				G.map[shortestPathRecord[i]][shortestPathRecord[i + 1]] = 0;
 				}
-			for(int i=0;i<G.vertexNumber;i++)
-				for(int j=0;j<G.vertexNumber;j++)
-					if(G.map[i][j]>=1)
+			for(int i = 0;i < G.vertexNumber;i++)
+				for(int j = 0;j<G.vertexNumber;j++)
+					if(G.map[i][j] >= 1)
 					{
-						a=G.data[i];
-						b=G.data[j];
-						line=("  "+a+"->"+b+"[label=\""+G.map[i][j]+"\"]\r\n").getBytes();
+						a = G.data[i];
+						b = G.data[j];
+						line = ("  " + a+"->" + b + "[label=\"" + G.map[i][j] + "\"]\r\n").getBytes();
 						out.write(line);
 					}
 			line="}".getBytes();
 			out.write(line);
 			out.close();
-			for(int i=0;i<num;i++)
-				G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]=recordFlag[i];
+			for(int i = 0;i < num;i++)
+				G.map[shortestPathRecord[i]][shortestPathRecord[i + 1]]=recordFlag[i];
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		try { 
 			Runtime rt = Runtime.getRuntime(); 
-			rt.exec("cmd /c cd "+dotpath +" && "+ dotmegPath);
+			rt.exec("cmd /c cd " + dotpath + " && " + dotmegPath);
 			  
 		} catch (Exception e) { 
 			e.printStackTrace(); 
 		} 
 		return shortestPath;
 	}
+	/**
+	 * ${tags}
+	 */
 	
 	public static String randomWalk() {
 		String randomText = "";
@@ -315,7 +284,7 @@ public class lab1{
 			i = G.path[i][j];
 		}
 		
-		File file=new File("random.txt");
+		File file = new File("random.txt");
 		try {
 			file.createNewFile();
 		}catch(Exception e) {
@@ -324,8 +293,7 @@ public class lab1{
 		
 		try {
 			byte line[]=null;
-			String a,b;
-			FileOutputStream out=new FileOutputStream(file);
+			FileOutputStream out = new FileOutputStream(file);
 			line=randomText.getBytes();
 			out.write(line);
 			out.close();
@@ -334,6 +302,9 @@ public class lab1{
 		}
 		return randomText;
 	}
+	/**
+	 * ${tags}
+	 */
 	
 	public static void main(String[] args) {
 		System.out.println("输入文本文件路径: ");
@@ -383,7 +354,7 @@ public class lab1{
 		System.out.println("1.展示有向图\n2.查询桥接词\n3.根据桥接词生成新文本\n4.计算两个单词之间的最短路径\n5.随机游走\n6.退出");
 		while ((option = systemIn.nextLine()) != null) {
 			if (option.equals("1"))
-				new lab1().showDirectedGraph(G);
+				new Lab1().showDirectedGraph(G);
 			if (option.equals("2")) {
 				String word1 = "", word2 = "";
 				System.out.println("输入word1: ");
@@ -413,5 +384,78 @@ public class lab1{
 			System.out.println("1.展示有向图\n2.查询桥接词\n3.根据桥接词生成新文本\n4.计算两个单词之间的最短路径\n5.随机游走\n6.退出");
 		}
 		systemIn.close();
+	}
+}
+
+class Graph {
+	String[] data;
+	int edgeNumber;
+	int vertexNumber;
+	int[] next;
+	int[] flag;
+	int[][] map;
+	int[][] path;
+	int[][] record;
+
+	/**
+	 * ${tags}
+	 */
+	
+	public Graph() {
+		this.vertexNumber = 0;
+		this.edgeNumber = 0;
+		this.data = new String[99];
+		this.next = new int[99];
+		this.flag = new int[99];
+		this.map = new int[99][99];
+		this.path = new int[99][99];
+		this.record = new int[99][99];
+
+	}
+	/**
+	 * ${tags}
+	 */
+	
+	public int search(String word) {
+		for (int i = 0; i < this.vertexNumber; i++)
+			if (this.data[i].equals(word))
+				return i;
+			return -1;
+	}
+	/**
+	 * ${tags}
+	 */
+	
+	public void newVertex(String word) {
+		this.data[this.vertexNumber++] = word;
+	}
+	/**
+	 * ${tags}
+	 */
+	
+	public void newEdge(String word1, String word2) {
+		int word1Number = 0, word2Number = 0;
+		for (int i = 0; i < this.vertexNumber; i++) {
+			if (this.data[i].equals(word1))
+				word1Number = i;
+			if (this.data[i].equals(word2))
+				word2Number = i;
+		}
+		this.edgeNumber++;
+		this.map[word1Number][word2Number]++;
+	}
+	/**
+	 * ${tags}
+	 */
+	
+	public void getNext() {
+		this.next = new int[99];
+		this.flag = new int[99];
+		this.path = new int[99][99];
+		this.record = new int[99][99];
+		for (int i = 0; i < this.vertexNumber; i++)
+			for (int j = 0; j < this.vertexNumber; j++)
+				if (this.map[i][j] > 0)
+					this.path[i][this.next[i]++] = j;
 	}
 }
