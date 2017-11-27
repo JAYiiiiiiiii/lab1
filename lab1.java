@@ -1,4 +1,6 @@
-ï»¿import java.io.BufferedReader;
+package lab1;
+
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -8,46 +10,225 @@ import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
-public class Lab1{ 
-    
-	static Graph G = new Graph();
-	static int bridgeNumber;
-	static ArrayList<String> bridgeWords;
-	static Random random = new Random();
-	static String dotpath = "C:\\Users\\ASUS\\Desktop\\lab1";
-	static String dotmegPath = "dot -Tjpg path.dot -o path.jpg";
-	static String dotmeg = "dot -Tjpg lab1.dot -o lab1.jpg";
-	/**
-	 * ${tags}
-	 */	
+class graph {
+	String[] data;
+	int edgeNumber;
+	int vertexNumber;
+	int[] next;
+	int[] flag;
+	int[][] map;
+	int[][] path;
+	int[][] record;
+
 	
-	public void showDirectedGraph(Graph g) {
-		
-		File file = new File("lab1.dot");
-		try {
-			file.createNewFile();
-		} catch (Exception e) {
-			e.printStackTrace();
+	public graph() {
+		this.vertexNumber = 0;
+		this.edgeNumber = 0;
+		this.data = new String[99];
+		this.next = new int[99];
+		this.flag = new int[99];
+		this.map = new int[99][99];
+		this.path = new int[99][99];
+		this.record = new int[99][99];
+
+	}
+	
+	public int search(String word) {
+		for (int i = 0; i < this.vertexNumber; i++)
+			if (this.data[i].equals(word))
+				return i;
+			return -1;
+	}
+	public void newVertex(String word) {
+		this.data[this.vertexNumber++] = word;
+	}
+	
+	public void newEdge(String word1, String word2) {
+		int word1Number = 0, word2Number = 0;
+		for (int i = 0; i < this.vertexNumber; i++) {
+			if (this.data[i].equals(word1))
+				word1Number = i;
+			if (this.data[i].equals(word2))
+				word2Number = i;
 		}
-		
-		try {
-			byte[] line=null;
-			String a,b;
-			FileOutputStream out=new FileOutputStream(file);
-			line="digraph pic1 { \r\n".getBytes();
-			out.write(line);
-			for(int i=0;i<g.vertexNumber;i++) {
-				for(int j=0;j<g.vertexNumber;j++)
-					if(g.map[i][j]>=1)
-					{
-						a=g.data[i];
-						b=g.data[j];
-						line=("  " + a + "->" + b + "[label=\"" + g.map[i][j] + "\"]\r\n").getBytes();
-						out.write(line);
-					}
+		this.edgeNumber++;
+		this.map[word1Number][word2Number]++;
+	}
+	
+	public void getNext() {
+		this.next = new int[99];
+		this.flag = new int[99];
+		this.path = new int[99][99];
+		this.record = new int[99][99];
+		for (int i = 0; i < this.vertexNumber; i++)
+			for (int j = 0; j < this.vertexNumber; j++)
+				if (this.map[i][j] > 0)
+					this.path[i][this.next[i]++] = j;
+	}
+}
+
+class bridgeWord extends graph{
+	public String word1="";
+	public String word2="";
+	public String bridgeword="";
+	public graph G;
+	public ArrayList<String> bridgeWords;
+	public int bridgeNumber;
+
+	public String queryBridgeWord() {
+		int word1Number = G.search(word1);
+		int word2Number = G.search(word2);
+		bridgeNumber = 0;
+		bridgeWords = new ArrayList<String>();
+		if (word1Number == -1 && word2Number != -1) {
+			bridgeNumber = -1;
+			bridgeword = "No \"" + word1 + "\" in the graph!";
+		}
+		if (word1Number != -1 && word2Number == -1) {
+			bridgeNumber = -2;
+			bridgeword = "No \"" + word2 + "\" in the graph!";
+		}
+		if (word1Number == -1 && word2Number == -1) {
+			bridgeNumber = -3;
+			bridgeword = "No \"" + word1 + "\" and \"" + word2 + "\" in the graph!";
+		}
+		if (bridgeNumber == 0) {
+			for (int i = 0; i < G.vertexNumber; i++)
+				if (G.map[word1Number][i] > 0 && G.map[i][word2Number] > 0)
+					bridgeWords.add(G.data[i]);
+			bridgeNumber = bridgeWords.size();
+		}
+		if (bridgeNumber == 0)
+			bridgeword = "No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!";
+		if (bridgeNumber == 1)
+			bridgeword = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" is: " + bridgeWords.get(0);
+		if (bridgeNumber > 1) {
+			bridgeword = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ";
+			for (int i = 0; i < bridgeWords.size() - 1; i++)
+				bridgeword += bridgeWords.get(i) + ", ";
+			bridgeword += "and " + bridgeWords.get(bridgeWords.size() - 1) + ".";
+		}
+		return bridgeword;
+	}
+}
+
+public class lab1{
+	
+	static graph G = new graph();
+	//static int bridgeNumber;
+	//static ArrayList<String> bridgeWords;
+	static Random random = new Random();
+	static String dotpath="C:\\Users\\ASUS\\Desktop\\lab1";
+	static String dotmegPath="dot -Tjpg path.dot -o path.jpg";
+	static String dotmeg="dot -Tjpg lab1.dot -o lab1.jpg";
+	
+	public static void actorMenu() {
+		String option = "";
+		Scanner systemIn = new Scanner(System.in);
+		System.out.println("ÓÐÏòÍ¼Éú³É³É¹¦£¡\n");
+		System.out.println("1.ÖØÐÂÉú³ÉÓÐÏòÍ¼\n2.²éÑ¯ÇÅ½Ó´Ê\n3.¸ù¾ÝÇÅ½Ó´ÊÉú³ÉÐÂÎÄ±¾\n4.¼ÆËãÁ½¸öµ¥´ÊÖ®¼äµÄ×î¶ÌÂ·¾¶\n5.Ëæ»úÓÎ×ß\n6.ÍË³ö");
+		while ((option = systemIn.nextLine()) != null) {
+			if (option.equals("1"))
+				showDirectedGraph();
+			if (option.equals("2")) {
+				String word1 = "", word2 = "";
+				System.out.println("ÊäÈëword1: ");
+				word1 = systemIn.nextLine();
+				System.out.println("ÊäÈëword2: ");
+				word2 = systemIn.nextLine();
+				queryBridgeWords(word1, word2);
 			}
+			if (option.equals("3")) {
+				String newTxtIn = "";
+				System.out.println("ÊäÈëÐÂÎÄ±¾: ");
+				newTxtIn = systemIn.nextLine();
+				System.out.println(generateNewText(newTxtIn));
+			}
+			if (option.equals("4")) {
+				String word1 = "", word2 = "";
+				System.out.println("ÊäÈëword1: ");
+				word1 = systemIn.nextLine();
+				System.out.println("ÊäÈëword2: ");
+				word2 = systemIn.nextLine();
+				System.out.println(calcShortestPath(word1, word2));
+			}
+			if (option.equals("5"))
+				System.out.println(randomWalk());
+			if (option.equals("6"))
+				break;
+			System.out.println("1.ÖØÐÂÉú³ÉÓÐÏòÍ¼\n2.²éÑ¯ÇÅ½Ó´Ê\n3.¸ù¾ÝÇÅ½Ó´ÊÉú³ÉÐÂÎÄ±¾\n4.¼ÆËãÁ½¸öµ¥´ÊÖ®¼äµÄ×î¶ÌÂ·¾¶\n5.Ëæ»úÓÎ×ß\n6.ÍË³ö");
+		}
+		systemIn.close();
+	}
+	
+	public static void showDirectedGraph() {
+	//System.out.println("ÊäÈëÎÄ±¾ÎÄ¼þÂ·¾¶: ");
+	ArrayList<String> words = new ArrayList<String>();
 				
-			line = "}".getBytes();
+	//String filePath = systemIn.nextLine();
+	String filePath = "C:\\Users\\ASUS\\Desktop\\lab1\\in.txt";
+	try {
+		String encoding = "GBK";
+		File file = new File(filePath);
+		if(file.isFile() && file.exists()) {
+			InputStreamReader read = new InputStreamReader(new FileInputStream(file),encoding);
+			BufferedReader bufferedReader = new BufferedReader(read);
+			String lineTxt = null;
+			while((lineTxt = bufferedReader.readLine()) != null) {
+				lineTxt = lineTxt.toLowerCase();
+				String word = "";
+				for (int i = 0; i < lineTxt.length(); i++) {
+					if (lineTxt.charAt(i) <= 'z' && lineTxt.charAt(i) >= 'a') {
+						word += lineTxt.charAt(i);
+						if (i == lineTxt.length() - 1)
+							words.add(word);
+						}
+						else {
+							if (word != "")
+								words.add(word);
+							word = "";
+						}
+					}	
+				}
+			read.close();
+		}
+		else {
+			System.out.println("No File!");
+		}
+	}
+	catch (Exception e) {
+		System.out.println("Error!");
+		e.printStackTrace();
+	}
+	for (int i = 0; i < words.size(); i++) {
+		if (G.search(words.get(i)) == -1)
+			G.newVertex(words.get(i));
+		if (i != 0)
+			G.newEdge(words.get(i - 1), words.get(i));
+	}		
+	File file=new File("lab1.dot");
+	try {
+		file.createNewFile();
+	}catch(Exception e) {
+		e.printStackTrace();
+	}
+		
+	try {
+		byte line[]=null;
+		String a,b;
+		FileOutputStream out=new FileOutputStream(file);
+		line="digraph pic1 { \r\n".getBytes();
+		out.write(line);
+		for(int i=0;i<G.vertexNumber;i++)
+			for(int j=0;j<G.vertexNumber;j++)
+				if(G.map[i][j]>=1)
+				{
+					a=G.data[i];
+					b=G.data[j];
+					line=("  "+a+"->"+b+"[label=\""+G.map[i][j]+"\"]\r\n").getBytes();
+					out.write(line);
+				}
+			line="}".getBytes();
 			out.write(line);
 			out.close();
 		}catch(Exception e) {
@@ -56,65 +237,22 @@ public class Lab1{
 		
 		try { 
 			Runtime rt = Runtime.getRuntime(); 
-			rt.exec("cmd /c cd " + dotpath + " && " + dotmeg);
+			rt.exec("cmd /c cd "+dotpath +" && "+ dotmeg);
 			  
 		} catch (Exception e) { 
 			e.printStackTrace(); 
 		} 
 			 
 	}
-		
-	/**
-	 * ${tags}
-	 */
 	
-	public static String queryBridgeWords(String word1, String word2) {
-		String bridge = "";
-		int word1Number = G.search(word1);
-		int word2Number = G.search(word2);
-		bridgeNumber = 0;
-		bridgeWords = new ArrayList<String>();
-		if (word1Number == -1 && word2Number != -1) {
-			bridgeNumber = -1;
-			bridge = "No \"" + word1 + "\" in the graph!";
-		}
-		if (word1Number != -1 && word2Number == -1) {
-			bridgeNumber = -2;
-			bridge = "No \"" + word2 + "\" in the graph!";
-		}
-		if (word1Number == -1 && word2Number == -1) {
-			bridgeNumber = -3;
-			bridge = "No \"" + word1 + "\" and \"" + word2 + "\" in the graph!";
-		}
-		if (bridgeNumber == 0) {
-			for (int i = 0; i < G.vertexNumber; i++) {
-				if (G.map[word1Number][i] > 0 && G.map[i][word2Number] > 0)
-					bridgeWords.add(G.data[i]);
-			}
-				
-			bridgeNumber = bridgeWords.size();
-		}
-		if (bridgeNumber == 0) {
-			bridge = "No bridge words from \"" + word1 + "\" to \"" + word2 + "\"!";
-		}
-			
-		if (bridgeNumber == 1) {
-			bridge = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" is: " 
-			+ bridgeWords.get(0);
-		}
-			
-		if (bridgeNumber > 1) {
-			bridge = "The bridge words from \"" + word1 + "\" to \"" + word2 + "\" are: ";
-			for (int i = 0; i < bridgeWords.size() - 1; i++) {
-				bridge += bridgeWords.get(i) + ", ";
-			}			
-			bridge += "and " + bridgeWords.get(bridgeWords.size() - 1) + ".";
-		}
-		return bridge;
+	
+	public static void queryBridgeWords(String word1, String word2) {
+		bridgeWord B=new bridgeWord();
+		B.word1=word1;
+		B.word2=word2;
+		B.G=G;
+		System.out.println(B.queryBridgeWord());
 	}
-	/**
-	 * ${tags}
-	 */
 	
 	public static String generateNewText(String inputText) {
 		String newText = "";
@@ -124,9 +262,8 @@ public class Lab1{
 		for (int i = 0; i < lineTxt.length(); i++) {
 			if (lineTxt.charAt(i) <= 'z' && lineTxt.charAt(i) >= 'a') {
 				word += lineTxt.charAt(i);
-				if (i == lineTxt.length() - 1) {
+				if (i == lineTxt.length() - 1)
 					words.add(word);
-				}				
 			}
 			else {
 				if (word != "")
@@ -134,32 +271,33 @@ public class Lab1{
 				word = "";
 			}
 		}
+		bridgeWord B=new bridgeWord();
 		for (int i = 0; i < words.size() - 1; i++) {
 			int randomNumber = 0;
 			String newWord = "";
-			queryBridgeWords(words.get(i), words.get(i + 1));
-			if (bridgeNumber > 0) {
-				randomNumber = random.nextInt(bridgeNumber);
-				newWord = bridgeWords.get(randomNumber);
+			B.word1=words.get(i);
+			B.word2=words.get(i + 1);
+			B.G=G;
+			B.queryBridgeWord();
+			//queryBridgeWords(words.get(i), words.get(i + 1));
+			if (B.bridgeNumber > 0) {
+				randomNumber = random.nextInt(B.bridgeNumber);
+				newWord = B.bridgeWords.get(randomNumber);
 				newText += words.get(i) + " " + newWord + " ";
 			}
-			else {
-				newText += words.get(i) + " ";				
-			}
+			else
+				newText +=words.get(i) + " ";
 		}
 		newText += words.get(words.size() - 1);
 		return newText;
 	}
-	/**
-	 * ${tags}
-	 */
 	
 	public static String calcShortestPath(String word1, String word2) {
 		
-		File file = new File("path.dot");
+		File file=new File("path.dot");
 		try {
 			file.createNewFile();
-		} catch (Exception e) {
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		
@@ -167,9 +305,9 @@ public class Lab1{
 		ArrayList<String> path = new ArrayList<String>();
 		int[] searchList = new int[99];
 		int[] pre = new int[99];
-		int[] shortestPathRecord = new int[99];
-		int num = 0;
-		int[] recordFlag = new int[99];
+		int shortestPathRecord[]=new int[99];
+		int num=0;
+		int recordFlag[] = new int[99];
 		Arrays.fill(searchList, -1);
 		Arrays.fill(pre, -1);
 		int head = 0, tail = 1, goal = G.search(word2);
@@ -195,11 +333,12 @@ public class Lab1{
 					path.add(G.data[pos]);
 				}
 				shortestPath += G.data[searchList[0]];
-				shortestPathRecord[num] = searchList[0];
-				for (int i = path.size() - 2; i >= 0; i--){
-					for(int j = 0;j < G.vertexNumber;j++)
+				shortestPathRecord[num]=searchList[0];
+				for (int i = path.size() - 2; i >= 0; i--)
+				{
+					for(int j=0;j<G.vertexNumber;j++)
 						if(path.get(i).equals(G.data[j]))
-							shortestPathRecord[++num] = j;
+							shortestPathRecord[++num]=j;
 					shortestPath += "->" + path.get(i);
 					}
 				shortestPath += "->" + G.data[goal];
@@ -215,58 +354,54 @@ public class Lab1{
 			return shortestPath;
 		}
 		try {
-			byte[] line = null;
+			byte line[]=null;
 			String a,b;
-			FileOutputStream out = new FileOutputStream(file);
+			FileOutputStream out=new FileOutputStream(file);
 			line="digraph pic2 { \r\n".getBytes();
 			out.write(line);
-			line = (G.data[shortestPathRecord[0]] + "[color=pink style=filled]\r\n").getBytes();
+			line=(G.data[shortestPathRecord[0]]+"[color=pink style=filled]\r\n").getBytes();
 			out.write(line);
-			for(int i = 1;i < num;i++){
-				line=(G.data[shortestPathRecord[i]] + "[color=green style=filled]\r\n").getBytes();
+			for(int i=1;i<num;i++){
+				line=(G.data[shortestPathRecord[i]]+"[color=green style=filled]\r\n").getBytes();
 				out.write(line);
 			}
-			line = (G.data[shortestPathRecord[num]] + "[color=skyblue style=filled]\r\n").getBytes();
+			line=(G.data[shortestPathRecord[num]]+"[color=skyblue style=filled]\r\n").getBytes();
 			out.write(line);
-			for(int i = 0;i < num;i++){
-				a = G.data[shortestPathRecord[i]];
-				b = G.data[shortestPathRecord[i+1]];
-				line = ("  " + a + "->" + b + " [label=\"" + 
-				G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]+"\" style=filled color=blue]\r\n").getBytes();
+			for(int i=0;i<num;i++){
+				a=G.data[shortestPathRecord[i]];
+				b=G.data[shortestPathRecord[i+1]];
+				line=("  "+a+"->"+b+" [label=\""+G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]+"\" style=filled color=blue]\r\n").getBytes();
 				out.write(line);
-				recordFlag[i] = G.map[shortestPathRecord[i]][shortestPathRecord[i + 1]];
-				G.map[shortestPathRecord[i]][shortestPathRecord[i + 1]] = 0;
+				recordFlag[i]=G.map[shortestPathRecord[i]][shortestPathRecord[i+1]];
+				G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]=0;
 				}
-			for(int i = 0;i < G.vertexNumber;i++)
-				for(int j = 0;j<G.vertexNumber;j++)
-					if(G.map[i][j] >= 1)
+			for(int i=0;i<G.vertexNumber;i++)
+				for(int j=0;j<G.vertexNumber;j++)
+					if(G.map[i][j]>=1)
 					{
-						a = G.data[i];
-						b = G.data[j];
-						line = ("  " + a+"->" + b + "[label=\"" + G.map[i][j] + "\"]\r\n").getBytes();
+						a=G.data[i];
+						b=G.data[j];
+						line=("  "+a+"->"+b+"[label=\""+G.map[i][j]+"\"]\r\n").getBytes();
 						out.write(line);
 					}
 			line="}".getBytes();
 			out.write(line);
 			out.close();
-			for(int i = 0;i < num;i++)
-				G.map[shortestPathRecord[i]][shortestPathRecord[i + 1]]=recordFlag[i];
+			for(int i=0;i<num;i++)
+				G.map[shortestPathRecord[i]][shortestPathRecord[i+1]]=recordFlag[i];
 		}catch(Exception e) {
 			e.printStackTrace();
 		}
 		
 		try { 
 			Runtime rt = Runtime.getRuntime(); 
-			rt.exec("cmd /c cd " + dotpath + " && " + dotmegPath);
+			rt.exec("cmd /c cd "+dotpath +" && "+ dotmegPath);
 			  
 		} catch (Exception e) { 
 			e.printStackTrace(); 
 		} 
 		return shortestPath;
 	}
-	/**
-	 * ${tags}
-	 */
 	
 	public static String randomWalk() {
 		String randomText = "";
@@ -282,179 +417,12 @@ public class Lab1{
 				break;
 			i = G.path[i][j];
 		}
-		
-		File file = new File("random.txt");
-		try {
-			file.createNewFile();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-		try {
-			byte line[]=null;
-			FileOutputStream out = new FileOutputStream(file);
-			line=randomText.getBytes();
-			out.write(line);
-			out.close();
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
 		return randomText;
 	}
-	/**
-	 * ${tags}
-	 */
 	
 	public static void main(String[] args) {
-		System.out.println("è¾“å…¥æ–‡æœ¬æ–‡ä»¶è·¯å¾„: ");
-		ArrayList<String> words = new ArrayList<String>();
-		String option = "";
-		Scanner systemIn = new Scanner(System.in);
-		String filePath = systemIn.nextLine();
-		try {
-			String encoding = "GBK";
-			File file = new File(filePath);
-			if(file.isFile() && file.exists()) {
-				InputStreamReader read = new InputStreamReader(new FileInputStream(file),encoding);
-				BufferedReader bufferedReader = new BufferedReader(read);
-				String lineTxt = null;
-				while((lineTxt = bufferedReader.readLine()) != null) {
-					lineTxt = lineTxt.toLowerCase();
-					String word = "";
-					for (int i = 0; i < lineTxt.length(); i++) {
-						if (lineTxt.charAt(i) <= 'z' && lineTxt.charAt(i) >= 'a') {
-							word += lineTxt.charAt(i);
-							if (i == lineTxt.length() - 1)
-								words.add(word);
-						}
-						else {
-							if (word != "")
-								words.add(word);
-							word = "";
-						}
-					}
-				}
-			read.close();
-			}
-			else {
-				System.out.println("No File!");
-			}
-		}
-		catch (Exception e) {
-			System.out.println("Error!");
-			e.printStackTrace();
-		}
-		for (int i = 0; i < words.size(); i++) {
-			if (G.search(words.get(i)) == -1)
-				G.newVertex(words.get(i));
-			if (i != 0)
-				G.newEdge(words.get(i - 1), words.get(i));
-		}
-		System.out.println("1.å±•ç¤ºæœ‰å‘å›¾\n2.æŸ¥è¯¢æ¡¥æŽ¥è¯\n3.æ ¹æ®æ¡¥æŽ¥è¯ç”Ÿæˆæ–°æ–‡æœ¬\n4.è®¡ç®—ä¸¤ä¸ªå•è¯ä¹‹é—´çš„æœ€çŸ­è·¯å¾„\n5.éšæœºæ¸¸èµ°\n6.é€€å‡º");
-		while ((option = systemIn.nextLine()) != null) {
-			if (option.equals("1"))
-				new Lab1().showDirectedGraph(G);
-			if (option.equals("2")) {
-				String word1 = "", word2 = "";
-				System.out.println("è¾“å…¥word1: ");
-				word1 = systemIn.nextLine();
-				System.out.println("è¾“å…¥word2: ");
-				word2 = systemIn.nextLine();
-				System.out.println(queryBridgeWords(word1, word2));
-			}
-			if (option.equals("3")) {
-				String newTxtIn = "";
-				System.out.println("è¾“å…¥æ–°æ–‡æœ¬: ");
-				newTxtIn = systemIn.nextLine();
-				System.out.println(generateNewText(newTxtIn));
-			}
-			if (option.equals("4")) {
-				String word1 = "", word2 = "";
-				System.out.println("è¾“å…¥word1: ");
-				word1 = systemIn.nextLine();
-				System.out.println("è¾“å…¥word2: ");
-				word2 = systemIn.nextLine();
-				System.out.println(calcShortestPath(word1, word2));
-			}
-			if (option.equals("5"))
-				System.out.println(randomWalk());
-			if (option.equals("6"))
-				break;
-			System.out.println("1.å±•ç¤ºæœ‰å‘å›¾\n2.æŸ¥è¯¢æ¡¥æŽ¥è¯\n3.æ ¹æ®æ¡¥æŽ¥è¯ç”Ÿæˆæ–°æ–‡æœ¬\n4.è®¡ç®—ä¸¤ä¸ªå•è¯ä¹‹é—´çš„æœ€çŸ­è·¯å¾„\n5.éšæœºæ¸¸èµ°\n6.é€€å‡º");
-		}
-		systemIn.close();
+		showDirectedGraph();
+		//actorMenu();
 	}
-}
-
-class Graph {
-	String[] data;
-	int edgeNumber;
-	int vertexNumber;
-	int[] next;
-	int[] flag;
-	int[][] map;
-	int[][] path;
-	int[][] record;
-
-	/**
-	 * ${tags}
-	 */
 	
-	public Graph() {
-		this.vertexNumber = 0;
-		this.edgeNumber = 0;
-		this.data = new String[99];
-		this.next = new int[99];
-		this.flag = new int[99];
-		this.map = new int[99][99];
-		this.path = new int[99][99];
-		this.record = new int[99][99];
-
-	}
-	/**
-	 * ${tags}
-	 */
-	
-	public int search(String word) {
-		for (int i = 0; i < this.vertexNumber; i++)
-			if (this.data[i].equals(word))
-				return i;
-			return -1;
-	}
-	/**
-	 * ${tags}
-	 */
-	
-	public void newVertex(String word) {
-		this.data[this.vertexNumber++] = word;
-	}
-	/**
-	 * ${tags}
-	 */
-	
-	public void newEdge(String word1, String word2) {
-		int word1Number = 0, word2Number = 0;
-		for (int i = 0; i < this.vertexNumber; i++) {
-			if (this.data[i].equals(word1))
-				word1Number = i;
-			if (this.data[i].equals(word2))
-				word2Number = i;
-		}
-		this.edgeNumber++;
-		this.map[word1Number][word2Number]++;
-	}
-	/**
-	 * ${tags}
-	 */
-	
-	public void getNext() {
-		this.next = new int[99];
-		this.flag = new int[99];
-		this.path = new int[99][99];
-		this.record = new int[99][99];
-		for (int i = 0; i < this.vertexNumber; i++)
-			for (int j = 0; j < this.vertexNumber; j++)
-				if (this.map[i][j] > 0)
-					this.path[i][this.next[i]++] = j;
-	}
 }
